@@ -1,0 +1,20 @@
+https://www.acmicpc.net/submit/2557
+
+ 
+
+1. 문제
+Hello World! 를 출력
+
+ 
+
+2. 풀이
+printf 함수 안에 Hello World! 넣어서 출력해주시면 됩니
+
+3. 코드
+#include <stdio.h>
+
+int main(void) {
+    printf("Hello World!");
+    
+    return 0;
+}
