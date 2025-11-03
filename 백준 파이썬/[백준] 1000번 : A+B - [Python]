@@ -1,0 +1,19 @@
+https://www.acmicpc.net/problem/1000
+
+1. 문제 
+두 정수 A와 B를 입력받은 다음, A+B를 출력하는 프로그램을 작성하시오.
+
+ 
+
+2. 풀이
+A, B에 들어올 문자들을 input()으로 받고 split()으로 나누어 변수에 저장한다
+
+이후 int를 이용하여 A,B를 정수로 변환하고 더하여 출력한다
+
+ 
+
+3.코드
+
+A, B = input().split()
+
+print(int(A) + int(B))
