@@ -1,0 +1,31 @@
+https://www.acmicpc.net/problem/1000
+
+ 
+
+1. 문제
+두 정수 A와 B를 입력받은 다음, A+B를 출력하는 프로그램을 작성하시오.
+
+2. 풀이
+int를 이용해 변수 A,B를 만든다
+
+이후 scanf를 이용하여 A와 B의 값을 받은 후 printf를 통하여 두 수의 합을 출력한다
+
+ 
+
+- %d는 4byte 정수값을 받음
+
+- scanf에서 &는 앞서 int를 통해 만든 A,B라는 변수의 위치를 알려준다 
+
+
+3.코드
+#include <stdio.h>
+
+int main(void) {
+    int A,B;
+    
+    scanf("%d %d", &A, &B);
+    
+    printf("%d", A+B);
+    
+    return 0;
+}
