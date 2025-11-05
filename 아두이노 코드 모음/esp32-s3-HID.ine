@@ -14,7 +14,7 @@ void setup() {
   Keyboard.releaseAll();
   delay(500);
   
-  // 1. WiFi
+  // 윈도우 + R 키
   Keyboard.press(KEY_LEFT_GUI);
   Keyboard.press('r');
   delay(100);
